@@ -26,13 +26,20 @@ type User struct {
 Finally query your structure like so :
 
 ```go
-func (u *User) Save() error {
-  return pogo.Save("INSERT INTO users(user_id, name) VALUES (:user_id, :values)")
+type User struct {
+	UserId string `pogo:"user_id"`
+	Name   string `pogo:"name"`
 }
 
 
+func createDatabase() *pogo.Database {
+	return pogo.NewDatabase("postgres", "postgres", "0.0.0.0", "5432", "pogo")
+}
 
-func (u *User) Get() error {
-  return pogo.Save("SELECT user_id, name")
+func GetUsers() ([]User, error) {
+	db := createDatabase()
+	users := make([]User, 0)
+	err := pogo.SuperQuery(db, "SELECT user_id, name FROM users ORDER BY user_id", &users)
+  return users, err
 }
 ```
