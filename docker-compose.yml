@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16.3-alpine3.20
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pogo
+    ports:
+      - 5432:5432
+    volumes:
+      - pogo-db-vol:/var/lib/postgresql/data
+
+volumes:
+  pogo-db-vol:
