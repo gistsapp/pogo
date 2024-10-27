@@ -1,12 +1,13 @@
 # POGO
 
-> Stop writing 20 lines of golang to just `SELECT` your data by getting rid of the `scan()` function.
+> A SQL utility library for Golang that will help you scale your codebase.
 
 ## Why using Pogo ?
 
-Golang philosophy is basically "let's write simple stuff efficiently". For most people, it means writing everything by themself but at Gists, we feel like that this take is wrong. Go devs shouldn't have to write and maintain a code base that involves 20 lines functions for just a classic `SELECT` or `INSERT` sql queries.
+Golang philosophy is basically "let's write simple stuff efficiently". For most people, it means writing everything by themselves. However, at Gists, we feel like writing everything from scratch is wrong when it comes to Web services. Go devs shouldn't have to write and maintain a code base that involves rewriting the same SQL boilerplate code over and over again. That's why we created POGO.
 
-We manage that by just providing a wrapper around `scan()` and customizable structure tags to making easy the mapping between your query parameters and your data structure. Therefore POGO is way more simple than an ORM but at the same time more scalable than writing your code using `pq`.
+We manage that by just providing a wrapper around `scan()` while leveraging customizable structure tags to make the mapping between your query parameters and your data structure easy.
+POGO is way more simpler than an ORM (for now its basically a one function library) while at the same time more scalable than writing your code using `pq`.
 
 ## How to use it ?
 
@@ -39,7 +40,7 @@ func createDatabase() *pogo.Database {
 func GetUsers() ([]User, error) {
 	db := createDatabase()
 	users := make([]User, 0)
-	err := pogo.SuperQuery(db, "SELECT user_id, name FROM users ORDER BY user_id", &users)
+	err := pogo.SuperQuery(db, "SELECT :fields FROM users ORDER BY user_id", &users) // :fields will be replaced by the fields of the User struct
   return users, err
 }
 ```

@@ -3,11 +3,16 @@ package pogo
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 // Function to map query results to struct fields based on `pogo` tag.
 func SuperQuery[T any](db *Database, query string, recipient *[]T, args ...any) error {
 	// Perform the query
+	if strings.Contains(query, ":fields") {
+		fields := get_tags(recipient)
+		query = strings.ReplaceAll(query, ":fields", strings.Join(fields, ","))
+	}
 	rows, err := db.Query(query, args...)
 	if err != nil {
 		return err
@@ -38,8 +43,7 @@ func SuperQuery[T any](db *Database, query string, recipient *[]T, args ...any) 
 
 		// Scan the struct fields and prepare for scanning the values from the row
 		fieldPointers := make([]interface{}, len(columns))
-		for i, column := range columns {
-			// Iterate through the struct fields to match the `pogo` tags
+		for i, column := range columns { // Iterate through the struct fields to match the `pogo` tags
 			for j := 0; j < newElem.NumField(); j++ {
 				field := newElem.Type().Field(j)
 				tag := field.Tag.Get("pogo")
@@ -70,4 +74,19 @@ func SuperQuery[T any](db *Database, query string, recipient *[]T, args ...any) 
 	}
 
 	return rows.Err()
+}
+
+func get_tags[T any](data *T) []string {
+	st := reflect.ValueOf(data)
+	elemType := st.Elem().Type().Elem()
+	newElem := reflect.New(elemType).Elem()
+	vals := make([]string, 0)
+
+	for i := 0; i < newElem.NumField(); i++ {
+		field := newElem.Type().Field(i)
+		val := field.Tag.Get("pogo")
+		vals = append(vals, val)
+	}
+
+	return vals
 }
